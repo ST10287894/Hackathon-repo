@@ -39,7 +39,8 @@ if(isEditing){
 }
 
 const EmptyState = () => {
-  <div className='channel-empty__container'>
+return(
+    <div className='channel-empty__container'>
     <p className='channel-empty__first'>
       This is the beginning of your chat history.
 
@@ -51,12 +52,14 @@ const EmptyState = () => {
     </p>
 
   </div>
+)
 
 }
 
   return (
     <div className='channel__container'>
       <Channel EmptyStateIndicator={EmptyState} 
+       channel={channel}
         Message={(messageProps, i) => <MessageTeam key={i} {...messageProps} />}>
         <ChannelInner setIsEditing={setIsEditing}/>
 

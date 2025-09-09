@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { StreamChat } from "stream-chat";
-import { Chat } from "stream-chat-react";
+import { Chat, MessageInput, MessageSimple } from "stream-chat-react";
 import Cookies from "universal-cookie";
 
-import {ChannelListContainer, ChannelContainer, Auth} from './components';
+import { ChannelListContainer, ChannelContainer, Auth } from './components';
 import './App.css';
 import 'stream-chat-react/dist/css/index.css';
 
@@ -11,60 +11,83 @@ const cookies = new Cookies();
 const apiKey = "uxfmm5h67nmx";
 
 const App = () => {
-  const [client, setClient] = useState(null);
-  const authToken = cookies.get('token');
+    const [client, setClient] = useState(null);
+    const [isCreating, setIsCreating] = useState(false);
+    const [isEditing, setIsEditing] = useState(false);
+    const [createType, setCreateType] = useState('');
+    const [reloadKey, setReloadKey] = useState(0); 
 
-  const [createType, setCreateType] = useState('');
-  const [isCreating, setIsCreating] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
+    const authToken = cookies.get('token');
 
-  useEffect(() => {
-    if (authToken) {
-      const client = new StreamChat(apiKey);
-      
-      client.connectUser({
-        id: cookies.get('userId'),
-        name: cookies.get('username'),
-        fullName: cookies.get('fullName'),
-        image: cookies.get('avatarURL'),
-      }, authToken)
-      .then(() => {
-        setClient(client);
-      })
-      .catch((error) => {
-        console.error("Stream Chat Connection Error:", error);
-        setClient(null);
-      });
+    useEffect(() => {
+        if (!authToken) {
+            return;
+        }
+
+        const newClient = new StreamChat(apiKey);
+
+        newClient.connectUser(
+            {
+                id: cookies.get('userId'),
+                name: cookies.get('username'),
+                fullName: cookies.get('fullName'),
+                image: cookies.get('avatarURL'),
+            },
+            authToken,
+        ).then(() => {
+            setClient(newClient);
+        }).catch((error) => {
+            console.error("Stream Chat Connection Error:", error);
+            setClient(null);
+        });
+
+        return () => newClient.disconnectUser();
+    }, [authToken, apiKey]);
+
+    if (!authToken) {
+        return <Auth />;
     }
-  }, [authToken, apiKey]);
 
-  if (!authToken) {
-    return <Auth />;
-  }
+    return (
+        <div className='app__wrapper'>
+            {client && (
+                <Chat
+                    client={client}
+                    theme="team light"
+                    key={reloadKey}
+                    components={{
+                        // This will override the components that are causing the crash
+                        Emoji: () => null,
+                        MessageSimple: (props) => (
+                            <div className="str-chat__message-simple">
+                                <p>{props.message.text}</p>
+                            </div>
+                        ),
+                        MessageInput: (props) => (
+                          <MessageInput {...props} emojiPicker={false} />
+                        ),
+                    }}
+                >
+                    <ChannelListContainer
+                        isCreating={isCreating}
+                        setIsCreating={setIsCreating}
+                        isEditing={isEditing}
+                        setIsEditing={setIsEditing}
+                        setCreateType={setCreateType}
+                        setReloadKey={setReloadKey}
+                    />
 
-  return (
-    
-    <div className='app__wrapper'>
-      {client && (
-        <Chat client={client} theme="team light">
-          <ChannelListContainer 
-            isCreating = {isCreating}
-            setIsCreating = {setIsCreating}
-            setIsEditing = {setIsEditing}
-            setCreateType = {setCreateType}
-          />
-            
-          <ChannelContainer 
-            isCreating = {isCreating}
-            setIsCreating = {setIsCreating}
-            isEditing = {isEditing}
-            setIsEditing = {setIsEditing}
-            createType = {createType}
-          />
-        </Chat>
-      )}
-    </div>
-  );
-}
+                    <ChannelContainer
+                        isCreating={isCreating}
+                        setIsCreating={setIsCreating}
+                        isEditing={isEditing}
+                        setIsEditing={setIsEditing}
+                        createType={createType}
+                    />
+                </Chat>
+            )}
+        </div>
+    );
+};
 
 export default App;

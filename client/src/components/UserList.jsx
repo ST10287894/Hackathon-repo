@@ -35,9 +35,11 @@ const handleSelect = () => {
     return(
         <div className="user-item__wrapper" onClick={handleSelect}>
             <div className="user-item__name-wrapper">
-                <Avatar image = {user.image} name = {user.fullName ||user.id} size = {32}/>
+                
+                <Avatar image = {user.image} name = {user.name || user.id} size = {32}/>
                 <p className="user-item__name">
-                    {user.fullName || user.id}
+                  
+                    {user.name || user.id}
                 </p>
 
             </div>
@@ -50,57 +52,50 @@ const handleSelect = () => {
 
 const UserList = ({setSelectedUsers}) => {
     const {client} = useChatContext();
-    const [users, setusers] = useState([]);
-    const [loading, setloading] = useState(false);
+    const [users, setUsers] = useState([]);
+    const [loading, setLoading] = useState(false);
     const [listEmpty, setListEmpty] = useState(false);
-    const [error, seterror] = useState(false)
+    const [error, setError] = useState(false)
 
     useEffect(() => {
         const getUsers = async () => {
         if(loading) return;
 
-        setloading(true);
+        setLoading(true);
 
         try{
             const response = await client.queryUsers(
                 {id: {$ne: client.userID}},
                 {id: 1},
-                {limit: 8}
-
+                {limit: 8, "fields": ["name"]}
             );
 
             if(response.users.length) {
-                setusers(response.users);
+                setUsers(response.users);
             } else {
-                seterror(true);
-
+                setListEmpty(true);
             }
 
         } catch (error) {
-            console.log(error);
-
+            setError(true);
         }
 
-        setloading(false);
-
+        setLoading(false);
         }
 
         if(client) {
             getUsers();
         }
 
-    }, []);
+    }, [client]);
 
     if(error) {
         return(
             <ListContainer>
                 <div className="user-list__message">
                     Error Loading, please refresh and try again
-
                 </div>
-
             </ListContainer>
-
         )
     }
 
@@ -109,11 +104,8 @@ const UserList = ({setSelectedUsers}) => {
             <ListContainer>
                 <div className="user-list__message">
                     No Users Found
-
                 </div>
-
             </ListContainer>
-
         )
     }
 
@@ -121,27 +113,19 @@ const UserList = ({setSelectedUsers}) => {
         <ListContainer>
             {loading ? <div className="user-list__message">
                 Loading Users...
-
             </div>: (
                 users?.length ? (
                     users.map((user, i) => (
                         <UserItem index={i} key={user.id} user = {user} setSelectedUsers = {setSelectedUsers}/>
                     ))
-
-            ) : (
-                <div className="user-list__message">
-                    No Users Found
-
-                </div>
-
-            )
+                ) : (
+                    <div className="user-list__message">
+                        No Users Found
+                    </div>
+                )
             )}
-
         </ListContainer>
-        
-
     )
-
 }
 
 export default UserList

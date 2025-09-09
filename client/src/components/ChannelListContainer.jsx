@@ -1,20 +1,18 @@
 import React, { useState } from 'react';
 import { ChannelList, useChatContext } from 'stream-chat-react';
-import { ChannelPreview } from 'stream-chat-react';
 import { ChannelSearch, TeamChannelList, TeamChannelPreview } from '../components';
 import Cookies from 'universal-cookie';
 import HospitalIcon from '../assets/hospital.png';
 import LogoutIcon from '../assets/logout.png';
 
 const cookies = new Cookies();
-const Sidebar = ({logout}) => (
+const Sidebar = ({ logout }) => (
     <div className="channel-list__sidebar">
         <div className="channel-list__sidebar__icon1">
             <div className="icon1__inner">
                 <img src={HospitalIcon} alt='Hospital' width='30' />
             </div>
         </div>
-
         <div className="channel-list__sidebar__icon2">
             <div className="icon2__inner" onClick={logout}>
                 <img src={LogoutIcon} alt='Logout' width='30' />
@@ -22,6 +20,7 @@ const Sidebar = ({logout}) => (
         </div>
     </div>
 );
+
 const CompanyHeader = () => (
     <div className='channel-list__header'>
         <p className='channel-list__header__text'>Connect Us</p>
@@ -31,10 +30,11 @@ const CompanyHeader = () => (
 const customChannelTeamFilter = (channels) => channels.filter((channel) => channel.type === 'team');
 const customChannelMessagingFilter = (channels) => channels.filter((channel) => channel.type === 'messaging');
 
-const ChannelListContent = ({ isCreating, setIsCreating, isEditing, setIsEditing, setCreateType, setToggleContainer }) => {
-    const {client} = useChatContext();
+// 💡 Receive the new prop here and pass it down
+const ChannelListContent = ({ isCreating, setIsCreating, isEditing, setIsEditing, setCreateType, setToggleContainer, channelListUpdated, setChannelListUpdated }) => {
+    const { client } = useChatContext();
 
-    const logout = () =>{
+    const logout = () => {
         cookies.remove('token');
         cookies.remove('userId');
         cookies.remove('username');
@@ -42,22 +42,23 @@ const ChannelListContent = ({ isCreating, setIsCreating, isEditing, setIsEditing
         cookies.remove('avatarURL');
         cookies.remove('phoneNumber');
         cookies.remove('avatarURL');
-        cookies.remove('hashedPassword')
-    
+        cookies.remove('hashedPassword');
         window.location.reload();
-    }
+    };
 
     const filters = { members: { $in: [client.userID] } };
 
     return (
         <>
-            <Sidebar logout ={logout}/>
+            <Sidebar logout={logout} />
             <div className='channel-list__list__wrapper'>
                 <CompanyHeader />
-                <ChannelSearch setToggleContainer={setToggleContainer}/>
+                <ChannelSearch setToggleContainer={setToggleContainer} />
                 <ChannelList
                     filters={filters}
                     channelRenderFilterFn={customChannelTeamFilter}
+                    // 💡 Add the key prop here. This is what forces the refresh.
+                    key={channelListUpdated ? 'team-updated' : 'team-unupdated'}
                     List={(listProps) => (
                         <TeamChannelList
                             {...listProps}
@@ -67,21 +68,25 @@ const ChannelListContent = ({ isCreating, setIsCreating, isEditing, setIsEditing
                             setCreateType={setCreateType}
                             setIsEditing={setIsEditing}
                             setToggleContainer={setToggleContainer}
+                            // 💡 Pass the setter down again
+                            setChannelListUpdated={setChannelListUpdated}
                         />
                     )}
                     Preview={(previewProps) => (
-                    < TeamChannelPreview
+                        <TeamChannelPreview
                             {...previewProps}
                             setIsCreating={setIsCreating}
                             setIsEditing={setIsEditing}
                             setToggleContainer={setToggleContainer}
-                            type = "team"/>   
-                            
+                            type="team"
+                        />
                     )}
                 />
                 <ChannelList
                     filters={filters}
                     channelRenderFilterFn={customChannelMessagingFilter}
+                    // 💡 Add the key prop here
+                    key={channelListUpdated ? 'messaging-updated' : 'messaging-unupdated'}
                     List={(listProps) => (
                         <TeamChannelList
                             {...listProps}
@@ -89,17 +94,20 @@ const ChannelListContent = ({ isCreating, setIsCreating, isEditing, setIsEditing
                             isCreating={isCreating}
                             setIsCreating={setIsCreating}
                             setIsEditing={setIsEditing}
-                            setCreateType = {setCreateType}
+                            setCreateType={setCreateType}
                             setToggleContainer={setToggleContainer}
+                            // 💡 Pass the setter down again
+                            setChannelListUpdated={setChannelListUpdated}
                         />
                     )}
                     Preview={(previewProps) => (
-                    < TeamChannelPreview
+                        <TeamChannelPreview
                             {...previewProps}
                             setIsCreating={setIsCreating}
                             setIsEditing={setIsEditing}
                             setToggleContainer={setToggleContainer}
-                            type = "messaging"/>   
+                            type="messaging"
+                        />
                     )}
                 />
             </div>
@@ -107,26 +115,36 @@ const ChannelListContent = ({ isCreating, setIsCreating, isEditing, setIsEditing
     );
 };
 
-const ChannelListContainer = () => {
-    const { setIsCreating, setIsEditing, isCreating } = useChatContext();
-    const [createType, setCreateType] = useState('');
-    const [toggleContainer, setToggleContainer] = useState(false)
+// 💡 Receive the new prop in ChannelListContainer
+const ChannelListContainer = ({ setCreateType, setIsCreating, setIsEditing, setChannelListUpdated }) => {
+    const [toggleContainer, setToggleContainer] = useState(false);
+    
     return (
         <>
-        <div className='channel-list__container'>
-            <ChannelListContent setIsCreating={setIsCreating} setIsEditing={setIsEditing} setCreateType={setCreateType} />
-        </div>
+            <div className='channel-list__container'>
+                <ChannelListContent 
+                    setIsCreating={setIsCreating} 
+                    setIsEditing={setIsEditing} 
+                    setCreateType={setCreateType}
+                    setChannelListUpdated={setChannelListUpdated} // 💡 Pass the setter down
+                    setToggleContainer={setToggleContainer}
+                />
+            </div>
 
-        <div className='channel-list__container-responsive' style={{left: toggleContainer ? "0%" : "-89%", backgroundColor: "#005fff"}}>
-            <div className='channel-list__container-toggle' onClick={setToggleContainer((prevToggleContainer) => !prevToggleContainer)}>
-                <p onClick={() => setToggleContainer(!toggleContainer)}>Channels</p>
+            <div className='channel-list__container-responsive' style={{ left: toggleContainer ? "0%" : "-89%", backgroundColor: "#005fff" }}>
+                <div className='channel-list__container-toggle' onClick={() => setToggleContainer((prevToggleContainer) => !prevToggleContainer)}>
+                    <p>Channels</p>
+                </div>
                 {toggleContainer && (
-                    <ChannelListContent setIsCreating={setIsCreating} setIsEditing={setIsEditing} setCreateType={setCreateType} />
+                    <ChannelListContent 
+                        setIsCreating={setIsCreating} 
+                        setIsEditing={setIsEditing} 
+                        setCreateType={setCreateType} 
+                        setToggleContainer={setToggleContainer}
+                        setChannelListUpdated={setChannelListUpdated} // 💡 Pass the setter down
+                    />
                 )}
             </div>
-                <ChannelListContent setIsCreating={setIsCreating} setIsEditing={setIsEditing} setCreateType={setCreateType} setToggleContainer={setToggleContainer}/>   
-
-        </div>
         </>
     );
 };
