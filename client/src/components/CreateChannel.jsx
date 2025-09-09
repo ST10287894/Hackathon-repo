@@ -66,7 +66,7 @@ const CreateChannel = ({createType, setIsCreating}) => {
         {createType === 'team' && <ChannelNameInput channelName={channelName} setChannelName={setChannelName}/>}
         <UserList setselectedUsers={setselectedUsers}/>
 
-        <div className='create-channel__button-wrapper' onClick={createChannel()}>
+        <div className='create-channel__button-wrapper' onClick={createChannel}>
             <p>{createType === 'team' ? 'Create Channel' : 'Create DM'}</p>
 
         </div>
