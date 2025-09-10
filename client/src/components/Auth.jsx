@@ -26,7 +26,7 @@ const Auth = () => {
       e.preventDefault();
       
       const { username, password, phoneNumber, avatarURL} = form;
-      const URL = 'https://hackathon-repo.onrender/auth';
+      const URL = 'https://hackathon-repo.onrender.com/auth';
        const { data: { token, userId, hashedPassword, fullName } } = await axios.post(`${URL}/${isSignup ? "signup" : "login"}`, { 
     username, password, fullName: form.fullName, phoneNumber, avatarURL
   });
@@ -141,4 +141,5 @@ const Auth = () => {
 
 
 export default Auth;
+
 
