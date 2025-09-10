@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { getChannel, useChatContext } from 'stream-chat-react';
 import { SearchIcon } from '../assets';
 import { ResultsDropdown } from './';
-
+//handles searching channels and users
 const ChannelSearch = ({ setToggleContainer }) => {
     const { client, setActiveChannel } = useChatContext();
     const [query, setQuery] = useState("");
-    const [loading, setLoading] = useState(false); // 💡 Change initial state to boolean false
+    const [loading, setLoading] = useState(false); 
     const [teamChannels, setTeamChannels] = useState([]);
-    const [directChannels, setDirectChannels] = useState([]); // 💡 Fix typo 'Chennels'
+    const [directChannels, setDirectChannels] = useState([]); 
 
     useEffect(() => {
         if (!query) {
@@ -17,7 +17,7 @@ const ChannelSearch = ({ setToggleContainer }) => {
         }
     }, [query]);
 
-    const getChannels = async (text) => { // 💡 Renamed function for clarity
+    const getChannels = async (text) => { 
         try {
             const channelResponse = client.queryChannels({
                 type: "team",
@@ -25,19 +25,12 @@ const ChannelSearch = ({ setToggleContainer }) => {
                 members: { $in: [client.userID] }
             });
 
-            // 💡 Correct the user query. This should be querying users, not channels.
             const userResponse = client.queryUsers({
                 id: { $ne: client.userID },
                 name: { $autocomplete: text },
             });
 
-            const [channels, { users }] = await Promise.all([channelResponse, userResponse]); // 💡 This destructuring is still incorrect. See the next example.
-
-            // The correct way to destructure is to get the users directly.
-            // Example: const [channels, { users }] = await Promise.all([channelResponse, userResponse]);
-            // This is still problematic because userResponse returns an object with a `users` key.
-            // It's cleaner to handle them separately.
-
+            const [channels, { users }] = await Promise.all([channelResponse, userResponse]); 
             
             if (channels.length) setTeamChannels(channels);
             if (users.length) setDirectChannels(users);

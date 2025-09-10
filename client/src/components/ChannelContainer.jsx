@@ -2,7 +2,8 @@ import React from 'react'
 import { Channel, useChatContext, MessageTeam } from 'stream-chat-react'
 
 import { ChannelInner, CreateChannel, EditChannel } from './'
-
+//this class is responsible for the chat interface and will pop differentt windows for creating and editing channels and when theres
+//  no chat it will inform the user to send something
 const ChannelContainer = (
   {
     isCreating,

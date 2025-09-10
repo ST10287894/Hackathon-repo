@@ -1,6 +1,6 @@
 import React from 'react';
 import { Avatar, useChatContext } from 'stream-chat-react';
-
+//shows results of search
 const channelByUser = async ({ client, setActiveChannel, channel }) => {
   const filters = {
     type: 'messaging',

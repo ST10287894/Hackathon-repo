@@ -30,7 +30,6 @@ const CompanyHeader = () => (
 const customChannelTeamFilter = (channels) => channels.filter((channel) => channel.type === 'team');
 const customChannelMessagingFilter = (channels) => channels.filter((channel) => channel.type === 'messaging');
 
-// 💡 Receive the new prop here and pass it down
 const ChannelListContent = ({ isCreating, setIsCreating, isEditing, setIsEditing, setCreateType, setToggleContainer, channelListUpdated, setChannelListUpdated }) => {
     const { client } = useChatContext();
 
@@ -57,7 +56,6 @@ const ChannelListContent = ({ isCreating, setIsCreating, isEditing, setIsEditing
                 <ChannelList
                     filters={filters}
                     channelRenderFilterFn={customChannelTeamFilter}
-                    // 💡 Add the key prop here. This is what forces the refresh.
                     key={channelListUpdated ? 'team-updated' : 'team-unupdated'}
                     List={(listProps) => (
                         <TeamChannelList
@@ -68,7 +66,6 @@ const ChannelListContent = ({ isCreating, setIsCreating, isEditing, setIsEditing
                             setCreateType={setCreateType}
                             setIsEditing={setIsEditing}
                             setToggleContainer={setToggleContainer}
-                            // 💡 Pass the setter down again
                             setChannelListUpdated={setChannelListUpdated}
                         />
                     )}
@@ -85,7 +82,6 @@ const ChannelListContent = ({ isCreating, setIsCreating, isEditing, setIsEditing
                 <ChannelList
                     filters={filters}
                     channelRenderFilterFn={customChannelMessagingFilter}
-                    // 💡 Add the key prop here
                     key={channelListUpdated ? 'messaging-updated' : 'messaging-unupdated'}
                     List={(listProps) => (
                         <TeamChannelList
@@ -96,7 +92,6 @@ const ChannelListContent = ({ isCreating, setIsCreating, isEditing, setIsEditing
                             setIsEditing={setIsEditing}
                             setCreateType={setCreateType}
                             setToggleContainer={setToggleContainer}
-                            // 💡 Pass the setter down again
                             setChannelListUpdated={setChannelListUpdated}
                         />
                     )}
@@ -115,7 +110,6 @@ const ChannelListContent = ({ isCreating, setIsCreating, isEditing, setIsEditing
     );
 };
 
-// 💡 Receive the new prop in ChannelListContainer
 const ChannelListContainer = ({ setCreateType, setIsCreating, setIsEditing, setChannelListUpdated }) => {
     const [toggleContainer, setToggleContainer] = useState(false);
     
@@ -126,7 +120,7 @@ const ChannelListContainer = ({ setCreateType, setIsCreating, setIsEditing, setC
                     setIsCreating={setIsCreating} 
                     setIsEditing={setIsEditing} 
                     setCreateType={setCreateType}
-                    setChannelListUpdated={setChannelListUpdated} // 💡 Pass the setter down
+                    setChannelListUpdated={setChannelListUpdated} 
                     setToggleContainer={setToggleContainer}
                 />
             </div>
@@ -141,7 +135,7 @@ const ChannelListContainer = ({ setCreateType, setIsCreating, setIsEditing, setC
                         setIsEditing={setIsEditing} 
                         setCreateType={setCreateType} 
                         setToggleContainer={setToggleContainer}
-                        setChannelListUpdated={setChannelListUpdated} // 💡 Pass the setter down
+                        setChannelListUpdated={setChannelListUpdated}
                     />
                 )}
             </div>
