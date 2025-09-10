@@ -1,6 +1,6 @@
 import React from 'react';
 import { Avatar, useChatContext } from 'stream-chat-react';
-
+// shows the preview for a single channel or direct message in the sidebar
 const TeamChannelPreview = ({ 
     setToggleContainer, 
     channel, 
@@ -8,7 +8,7 @@ const TeamChannelPreview = ({
     setIsCreating, 
     setIsEditing, 
     setActiveChannel,
-    setCreateType // Added missing prop
+    setCreateType 
 }) => {
     const { channel: activeChannel, client } = useChatContext();
     
@@ -29,7 +29,7 @@ const TeamChannelPreview = ({
                     size={24}
                 />
                 <p>
-                    {members[0]?.user?.fullName || members[0]?.user?.id} {/* Removed "name =" */}
+                    {members[0]?.user?.fullName || members[0]?.user?.id}
                 </p>
             </div>
         );

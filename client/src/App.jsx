@@ -6,7 +6,9 @@ import Cookies from "universal-cookie";
 import { ChannelListContainer, ChannelContainer, Auth } from './components';
 import './App.css';
 import 'stream-chat-react/dist/css/index.css';
-
+//handles authentication , Initializes and manages the connection to the Stream Chat, 
+// Maintains state for channel creation/editing modes and application reloads.
+//Renders the overall layout containing both the channel list sidebar and the main channel view.
 const cookies = new Cookies();
 const apiKey = "uxfmm5h67nmx";
 
@@ -56,7 +58,6 @@ const App = () => {
                     theme="team light"
                     key={reloadKey}
                     components={{
-                        // This will override the components that are causing the crash
                         Emoji: () => null,
                         MessageSimple: (props) => (
                             <div className="str-chat__message-simple">
