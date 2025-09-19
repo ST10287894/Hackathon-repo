@@ -46,39 +46,31 @@ const signup = async (req, res) => {
 const login = async (req, res) => {
     try {
         const { username, password } = req.body;
-        
-        // Initialize server client
+
         const serverClient = StreamChat.getInstance(api_key, api_secret);
-        
-        // Query users including custom fields - use the correct field name
-        const response = await serverClient.queryUsers(
-            { username: username }, // Query by username
-            { 'hashedPassword': 1 } // Include the custom field
-        );
-        
-        console.log('Query response:', response); // Debug log
-        
+
+        // Query users by the built-in 'name' field
+        const response = await serverClient.queryUsers({ name: username });
+
         if (!response.users || response.users.length === 0) {
             return res.status(400).json({ message: 'User not found' });
         }
         
         const user = response.users[0];
-        
-        // Check if hashedPassword custom field exists
+
+        // Ensure the custom field is present before attempting to compare
         if (!user.hashedPassword) {
-            console.log('User found but no hashedPassword field:', user);
             return res.status(400).json({ message: 'Password not set for user' });
         }
-        
-        // Compare passwords
+
         const success = await bcrypt.compare(password, user.hashedPassword);
         const token = serverClient.createToken(user.id);
 
         if (success) {
-            res.status(200).json({ 
-                token, 
-                fullName: user.name, 
-                username: user.username, 
+            res.status(200).json({
+                token,
+                fullName: user.name,
+                username: user.username,
                 userId: user.id,
                 phoneNumber: user.phoneNumber
             });
